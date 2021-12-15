@@ -1,0 +1,31 @@
+{
+  "C_Cpp.intelliSenseEngine": "Tag Parser",
+  "files.associations": {
+    "stdio.h": "c",
+    "freertos.h": "c",
+    "user.h": "c",
+    "string.h": "c",
+    "uart.h": "c",
+    "esp_system.h": "c",
+    "freertosconfig.h": "c",
+    "queue.h": "c",
+    "task.h": "c",
+    "timers.h": "c",
+    "*.inc": "c",
+    "esp_bt_main.h": "c",
+    "esp_bt.h": "c",
+    "esp_wifi.h": "c",
+    "esp_sleep.h": "c",
+    "rtc.h": "c",
+    "nvs_flash.h": "c",
+    "spi_common.h": "c",
+    "array": "c",
+    "string": "c",
+    "string_view": "c",
+    "initializer_list": "c",
+    "utility": "c",
+    "sstream": "c",
+    "chrono": "c",
+    "algorithm": "c"
+  }
+}
