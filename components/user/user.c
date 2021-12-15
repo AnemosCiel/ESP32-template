@@ -236,10 +236,6 @@ void user_uart_task(void *arg)
                 ESP_LOGI(TAG, "[UART DATA]: %d", event.size);
                 uart_read_bytes(huart, dtmp, event.size, portMAX_DELAY);
                 ESP_LOGI(TAG, "[DATA EVT]:%s", dtmp);
-                if (strstr((const char *)dtmp, "OK") != NULL)
-                {
-                    xSemaphoreGive(uartSemphr);
-                }
                 break;
 
             case UART_FIFO_OVF:
@@ -344,21 +340,10 @@ void user_lowpwoer(void)
  */
 void user_task(void *arg)
 {
-    // char InfoBuffer[512] = {0};
-    uint8_t len;
-    user_uart_sendstr("AT+RESET");
-    vTaskDelay(1000);
+    char InfoBuffer[512] = {0};
+
     while (1)
     {
-        xSemaphoreTake(wifiSemphr, portMAX_DELAY);
-        user_uart_sendstr("AT+ENTM");
-        xSemaphoreTake(uartSemphr, portMAX_DELAY);
-        len = uart_write_bytes(huart, lora_data, 38);
-        ESP_LOGI(TAG, "Send %d bytes data\n", len);
-        xSemaphoreTake(uartSemphr, 200);
-        user_uart_sendstr("+++");
-        vTaskDelay(1000);
-#if 0
         printf("heap size:%d\n", esp_get_free_heap_size());
         vTaskList((char *)&InfoBuffer);
         printf("任务名      任务状态  优先级   剩余栈 任务序号(R:Ready   B:Block    S:Suspend)\r\n");
@@ -367,7 +352,6 @@ void user_task(void *arg)
         printf("\r\n任务名          运行计数         使用率\r\n");
         printf("%s\r\n", InfoBuffer);
         vTaskDelay(pdMS_TO_TICKS(2000));
-#endif
     }
 }
 
@@ -381,8 +365,8 @@ void user_init(void)
 {
     // user_led_init();
     // bsp_adc_init();
-    user_uart_init();
-    bsp_wifi_init();
+    // user_uart_init();
+    // bsp_wifi_init();
     // user_lowpwoer();
 
 #if TASK_INFO

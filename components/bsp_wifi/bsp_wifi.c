@@ -23,7 +23,6 @@ static const char *TAG = "bsp_wifi";
 bsp_wifi_t wifi_info[BSP_WIFI_SCAN_LIST_SIZE] = {0};
 bsp_whitelist_t white_list[BSP_WIFI_WHITE_LIST_SIZE] = {0};
 uint16_t wifi_number; // Calculates the number of scanned AP
-uint8_t lora_data[BSP_WIFI_SCAN_LIST_SIZE * 3 + 2] = {0};
 SemaphoreHandle_t wifiSemphr = NULL;
 
 /**
@@ -51,30 +50,6 @@ void bsp_wifi_whitelist_add(uint8_t id, uint8_t mac1, uint8_t mac2, uint8_t mac3
 void bsp_wifi_whitelist_init(void)
 {
     bsp_wifi_whitelist_add(0, 0xdc, 0xfe, 0x18, 0x6b, 0x38, 0x3f);
-
-    bsp_wifi_whitelist_add(1, 0xa2, 0x12, 0xcb, 0x7e, 0xe4, 0x14);
-
-    bsp_wifi_whitelist_add(2, 0xdc, 0xa4, 0xca, 0x5d, 0x58, 0xaa);
-
-    bsp_wifi_whitelist_add(4, 0x76, 0xff, 0x7b, 0xb2, 0x53, 0xa4);
-}
-
-/**
- * @description:
- * @param:  null
- * @return: null
- * @note:
- */
-void bsp_wifi_packet(uint8_t *buff)
-{
-    *(buff++) = BSP_WIFI_HEAD;
-    for (uint8_t i = 0; i < BSP_WIFI_SCAN_LIST_SIZE; i++)
-    {
-        *(buff++) = (wifi_info[i].id >> 8);
-        *(buff++) = (wifi_info[i].id & 0xFF);
-        *(buff++) = wifi_info[i].rssi;
-    }
-    *(buff++) = BSP_WIFI_TAIL;
 }
 
 /**
@@ -134,36 +109,6 @@ void bsp_wifi_add(uint8_t index, uint8_t id, wifi_ap_record_t *ap)
              wifi_info[index].mac[3],
              wifi_info[index].mac[4],
              wifi_info[index].mac[5]);
-#endif
-#if 0
-    uint8_t zero[BSP_WIFI_MAC_SIZE] = { 0 };
-    uint8_t index = 0;
-
-    for(uint8_t i = 0; i < BSP_WIFI_SCAN_LIST_SIZE; i++)
-    {
-        if(memcmp(ap->bssid, wifi_info[i].mac, BSP_WIFI_MAC_SIZE) == 0)
-        {
-            wifi_info[i].rssi = ap->rssi;
-#if WIFI_INFO
-           printf("The mac of wifi_info[%d] is matching\n",i);
-#endif
-            return;
-        }
-    }
-
-    index = bsp_wifi_find(zero);
-    if(index == 0xFF)
-    {
-#if WIFI_INFO
-        printf("The wifi_info[] is no room\n");
-#endif
-        return;
-    }
-    memcpy(wifi_info[index].mac, ap->bssid, BSP_WIFI_MAC_SIZE);
-    wifi_info[index].rssi = ap->rssi;
-#if WIFI_INFO
-        printf("The wifi_info[%d] is NULL\n",index);
-#endif
 #endif
 }
 
@@ -240,10 +185,6 @@ static void bsp_wifi_scan(void)
             index++;
         }
     }
-    bsp_wifi_packet(lora_data);
-    for (uint8_t i = 0; i < BSP_WIFI_SCAN_LIST_SIZE * 3; i++)
-        printf("%02x", lora_data[i]);
-    printf("\r\n");
     xSemaphoreGive(wifiSemphr);
     free(ap_info);
 }

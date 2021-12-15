@@ -20,8 +20,6 @@
 #define BSP_WIFI_SCAN_LIST_SIZE 12
 #define BSP_WIFI_WHITE_LIST_SIZE 12
 
-#define BSP_WIFI_HEAD 0xAA
-#define BSP_WIFI_TAIL 0x55
 typedef struct
 {
     uint16_t id;
@@ -37,7 +35,6 @@ typedef struct
 /*------------------------------Exertn----------------------------------*/
 extern bsp_wifi_t wifi_info[BSP_WIFI_SCAN_LIST_SIZE];
 extern bsp_whitelist_t white_list[BSP_WIFI_WHITE_LIST_SIZE];
-extern uint8_t lora_data[BSP_WIFI_SCAN_LIST_SIZE * 3 + 2];
 extern SemaphoreHandle_t wifiSemphr;
 
 void bsp_wifi_init(void);
