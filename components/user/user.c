@@ -340,7 +340,7 @@ void user_lowpwoer(void)
  */
 void user_task(void *arg)
 {
-    char InfoBuffer[512] = {0};
+    char InfoBuffer[2048] = {0};
 
     while (1)
     {
@@ -351,7 +351,7 @@ void user_task(void *arg)
         vTaskGetRunTimeStats((char *)&InfoBuffer);
         printf("\r\n任务名          运行计数         使用率\r\n");
         printf("%s\r\n", InfoBuffer);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
 
@@ -365,8 +365,8 @@ void user_init(void)
 {
     // user_led_init();
     // bsp_adc_init();
-    // user_uart_init();
-    // bsp_wifi_init();
+    user_uart_init();
+    bsp_wifi_init();
     // user_lowpwoer();
 
 #if TASK_INFO

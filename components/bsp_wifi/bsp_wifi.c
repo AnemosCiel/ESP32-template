@@ -50,7 +50,14 @@ void bsp_wifi_whitelist_add(uint8_t id, uint8_t mac1, uint8_t mac2, uint8_t mac3
 void bsp_wifi_whitelist_init(void)
 {
     bsp_wifi_whitelist_add(0, 0xdc, 0xfe, 0x18, 0x6b, 0x38, 0x3f);
+
+    bsp_wifi_whitelist_add(1, 0xa2, 0x12, 0xcb, 0x7e, 0xe4, 0x14);
+
+    bsp_wifi_whitelist_add(2, 0xdc, 0xa4, 0xca, 0x5d, 0x58, 0xaa);
+
+    bsp_wifi_whitelist_add(4, 0x76, 0xff, 0x7b, 0xb2, 0x53, 0xa4);
 }
+
 
 /**
  * @description:
@@ -149,7 +156,6 @@ static void bsp_wifi_scan(void)
 
     esp_wifi_scan_start(NULL, true); /* Default scan mode, block until the scan is complete */
 
-    // bsp_wifi_print();
     esp_wifi_scan_get_ap_num(&apCount);
 #if WIFI_INFO
     ESP_LOGI(TAG, "Number of access points found: %d\n", apCount);
