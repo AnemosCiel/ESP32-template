@@ -49,6 +49,22 @@ int64_t user_get_systemtick(void)
     return time_since_boot;
 }
 
+ /**
+ * @description: 
+ * @param:  null
+ * @return: null
+ * @note: 
+ */
+int32_t user_get_runtime(int64_t start)
+{
+    int64_t stop = user_get_systemtick();
+    int64_t time = stop - start;
+
+    time = (time < 0) ? (-time) + 0xFFFFFFFF/2 : time;
+    ESP_LOGI(TAG, "Run time: %lld ms", time/1000);
+    return time;
+}
+
 /**
  * @description: led callback function
  * @param:  null
@@ -106,8 +122,8 @@ void user_key_isrcallback(void *arg)
 {
     /* Read pin level */
     uint8_t edge = gpio_get_level(hkey);
-
-    xQueueSendFromISR(keyQueue, &edge, NULL);
+    
+    xQueueSendFromISR(edgeQueue, &edge, NULL);
 }
 
 /**
@@ -119,7 +135,7 @@ void user_key_isrcallback(void *arg)
 void user_key_scan(void *arg)
 {
     key_event_t key_event = {0};
-    uint32_t edge = 0;
+    uint8_t edge = 0;
 
     while (1)
     {
@@ -146,6 +162,7 @@ void user_key_scan(void *arg)
                     {
                         /* Key long press */
                         key_event.press_type = 2;
+                        
                     }
                     else
                     {
@@ -209,6 +226,7 @@ void user_uart_sendstr(char *data)
     ESP_LOGI(TAG, "Wrote %d bytes", txbytes);
 #endif
     uart_write_bytes(huart, "\r\n", 2);
+    txbytes = data[0];
 }
 
 /**
@@ -227,53 +245,74 @@ void user_uart_task(void *arg)
         if (xQueueReceive(uartQueue, (void *)&event, (portTickType)portMAX_DELAY))
         {
             uint8_t dtmp[1024] = {0};
+#if UART_INFO
             ESP_LOGI(TAG, "uart[%d] event:", huart);
-
+#endif
             switch (event.type)
             {
             case UART_DATA:
                 /* Event of UART receving data */
-                ESP_LOGI(TAG, "[UART DATA]: %d", event.size);
                 uart_read_bytes(huart, dtmp, event.size, portMAX_DELAY);
+#if UART_INFO                
+                ESP_LOGI(TAG, "[UART DATA]: %d", event.size);
                 ESP_LOGI(TAG, "[DATA EVT]:%s", dtmp);
+#endif
+                if (strstr((const char *)dtmp, "OK") != NULL)
+                {
+                    xSemaphoreGive(uartSemphr);
+                }
                 break;
 
             case UART_FIFO_OVF:
                 /* Event of HW FIFO overflow detected */
+#if UART_INFO
                 ESP_LOGI(TAG, "hw fifo overflow");
+#endif
                 uart_flush_input(huart);
                 xQueueReset(uartQueue);
                 break;
 
             case UART_BUFFER_FULL:
                 /* Event of UART ring buffer full */
+#if UART_INFO
                 ESP_LOGI(TAG, "ring buffer full");
+#endif
                 uart_flush_input(huart);
                 xQueueReset(uartQueue);
                 break;
 
             case UART_BREAK:
                 /* Event of UART RX break detected */
+#if UART_INFO
                 ESP_LOGI(TAG, "uart rx break");
+#endif
                 break;
 
             case UART_PARITY_ERR:
                 /* Event of UART parity check error */
+#if UART_INFO
                 ESP_LOGI(TAG, "uart parity error");
+#endif
                 break;
 
             case UART_FRAME_ERR:
                 /* Event of UART frame error */
+#if UART_INFO
                 ESP_LOGI(TAG, "uart frame error");
+#endif
                 break;
 
             case UART_PATTERN_DET:
                 /* UART_PATTERN_DET */
+#if UART_INFO
                 ESP_LOGI(TAG, "uart pattern det");
+#endif
                 break;
 
             default:
+#if UART_INFO
                 ESP_LOGI(TAG, "uart event type: %d", event.type);
+#endif
                 break;
             }
         }
@@ -340,10 +379,23 @@ void user_lowpwoer(void)
  */
 void user_task(void *arg)
 {
-    char InfoBuffer[2048] = {0};
-
+    // char InfoBuffer[512] = {0};
+    uint8_t len;
+    user_uart_sendstr("AT+RESET");
+    vTaskDelay(1000);
     while (1)
     {
+        xSemaphoreTake(wifiSemphr, portMAX_DELAY);
+        user_uart_sendstr("AT+ENTM");
+        xSemaphoreTake(uartSemphr, portMAX_DELAY);
+        len = uart_write_bytes(huart, lora_data, sizeof(lora_data));
+#if UART_INFO
+        ESP_LOGI(TAG, "Send %d bytes data\n", len);
+#endif
+        xSemaphoreTake(uartSemphr, 200);
+        user_uart_sendstr("+++");
+        vTaskDelay(1000);
+#if 0
         printf("heap size:%d\n", esp_get_free_heap_size());
         vTaskList((char *)&InfoBuffer);
         printf("任务名      任务状态  优先级   剩余栈 任务序号(R:Ready   B:Block    S:Suspend)\r\n");
@@ -351,7 +403,8 @@ void user_task(void *arg)
         vTaskGetRunTimeStats((char *)&InfoBuffer);
         printf("\r\n任务名          运行计数         使用率\r\n");
         printf("%s\r\n", InfoBuffer);
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        vTaskDelay(pdMS_TO_TICKS(2000));
+#endif
     }
 }
 
@@ -363,14 +416,16 @@ void user_task(void *arg)
  */
 void user_init(void)
 {
-    // user_led_init();
+    user_led_init();
+    user_key_init();
     // bsp_adc_init();
-    user_uart_init();
-    bsp_wifi_init();
+    // user_uart_init();
+    // bsp_wifi_init();
+    // pingpong_init();
     // user_lowpwoer();
 
 #if TASK_INFO
     /* Show task info */
-    xTaskCreate(user_task, "user_task", 4096, NULL, 10, NULL);
+    // xTaskCreate(user_task, "user_task", 4096, NULL, 10, NULL);
 #endif
 }

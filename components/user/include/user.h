@@ -17,7 +17,7 @@
     7.This is some pin can be used as SPI
         VSPI(SPI2):MOSI(23), MISO(19), SCLK(18), CS(5)
         HSPI(SPI3):MOSI(13), MISO(12), SCLK(14), CS(15)
-    
+
 */
 /*-----------------------------Include-----------------------------------*/
 /***********lib***********/
@@ -34,26 +34,26 @@
 /*------------------------------Define----------------------------------*/
 /***********debug config***********/
 #define KEY_INFO 1
-#define UART_INFO 1
+#define UART_INFO 0
 #define TASK_INFO 1
 #define TICK_INFO 1
 /* Deep sleep */
 #define DEEPSLEEP_TIME 10 // unit: second
 /***********led***********/
-#define hled 5
+#define hled 25 /* LED pin number */
 
 #define USER_LED_ON 1
 #define USER_LED_OFF 0
 
 #define USER_LED_SPEED 1000 /* units: ms */
 /***********key***********/
-#define hkey 14              /* Key pin number */
+#define hkey 0               /* Key pin number */
 #define USER_KEY_JITTER 8    /* Jitter time (unit:ms) */
 #define USER_KEY_LONGPRESS 1 /* Key long press time (unit:s) */
 
 typedef struct
 {
-    uint32_t edge;                     /* Edge trigger type.The first two bytes are the hop edge type and the last two are the GPIO sequence number.The falling edge is 0 and the rising edge is 1*/
+    uint8_t edge;                     /* The falling edge is 0 and the rising edge is 1*/
     int64_t current_time;              /* Record the current trigger system time */
     int64_t rising_time, falling_time; /* Record the system time when rising edge and falling edge trigger */
     int64_t duration_time;             /* The duration of a button being pressed */
@@ -77,4 +77,6 @@ extern SemaphoreHandle_t uartSemphr;
 
 void user_init(void);
 void user_uart_sendstr(char *data);
+int64_t user_get_systemtick(void);
+int32_t user_get_runtime(int64_t star);
 #endif // !__USER_H/
