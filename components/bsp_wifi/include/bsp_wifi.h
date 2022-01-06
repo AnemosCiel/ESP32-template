@@ -13,12 +13,12 @@
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
 /*------------------------------Define----------------------------------*/
-#define WIFI_INFO 0
+#define WIFI_INFO           0
 
-#define BSP_WIFI_MAC_SIZE 6
+#define BSP_WIFI_MAC_SIZE   6
 
-#define BSP_WIFI_SCAN_LIST_SIZE 12
-#define BSP_WIFI_WHITE_LIST_SIZE 12
+#define BSP_WIFI_SCAN_LIST_SIZE     12
+#define BSP_WIFI_WHITE_LIST_SIZE    12
 
 typedef struct
 {
@@ -37,5 +37,5 @@ extern bsp_wifi_t wifi_info[BSP_WIFI_SCAN_LIST_SIZE];
 extern bsp_whitelist_t white_list[BSP_WIFI_WHITE_LIST_SIZE];
 extern SemaphoreHandle_t wifiSemphr;
 
-void bsp_wifi_init(void);
+void bsp_wifi_init( void );
 #endif // !__USER_H

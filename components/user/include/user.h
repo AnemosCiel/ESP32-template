@@ -33,23 +33,23 @@
 
 /*------------------------------Define----------------------------------*/
 /***********debug config***********/
-#define KEY_INFO 1
-#define UART_INFO 0
-#define TASK_INFO 1
-#define TICK_INFO 1
+#define KEY_INFO    1
+#define UART_INFO   0
+#define TASK_INFO   1
+#define TICK_INFO   1
 /* Deep sleep */
 #define DEEPSLEEP_TIME 10 // unit: second
 /***********led***********/
-#define hled 25 /* LED pin number */
+#define hled            25 /* LED pin number */
 
-#define USER_LED_ON 1
-#define USER_LED_OFF 0
+#define USER_LED_ON     1
+#define USER_LED_OFF    0
 
-#define USER_LED_SPEED 1000 /* units: ms */
+#define USER_LED_SPEED  1000 /* units: ms */
 /***********key***********/
-#define hkey 0               /* Key pin number */
-#define USER_KEY_JITTER 8    /* Jitter time (unit:ms) */
-#define USER_KEY_LONGPRESS 1 /* Key long press time (unit:s) */
+#define hkey                0   /* Key pin number */
+#define USER_KEY_JITTER     8   /* Jitter time (unit:ms) */
+#define USER_KEY_LONGPRESS  1   /* Key long press time (unit:s) */
 
 typedef struct
 {
@@ -75,8 +75,8 @@ typedef struct
 /*------------------------------Exertn----------------------------------*/
 extern SemaphoreHandle_t uartSemphr;
 
-void user_init(void);
-void user_uart_sendstr(char *data);
-int64_t user_get_systemtick(void);
-int32_t user_get_runtime(int64_t star);
+void user_init( void );
+void user_uart_sendstr( char *data );
+int64_t user_get_systemtick( void );
+int32_t user_get_runtime( int64_t star );
 #endif // !__USER_H/

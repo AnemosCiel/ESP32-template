@@ -3,7 +3,7 @@
 /**
  * ADC1(CH0~CH7):36,37,38,39,32,33,34,35
  * ADC2(CH0~CH9):4,0,2,15,13,12,14,27,25,26
- * adC2 shares certain resources with wiFi, so reading adC2 during wiFi may fail, 
+ * adC2 shares certain resources with wiFi, so reading adC2 during wiFi may fail,
  * and some of the adC2 pins cannot be used at will, such as gpiO0 for selecting how to run
  *   ESP32 Comparison table between ADC1 channel and Pin
     +----------+------------+-------+-----------------+--------------+
@@ -53,14 +53,14 @@
 #include  <stdint.h>
 /*----------driver---------*/
 /*------------------------------Define----------------------------------*/
-#define ADC_INFO 1
+#define ADC_INFO          1
 
-#define hadc ADC_UNIT_1
-#define BSP_ADC_CHANNEL ADC_CHANNEL_6
-#define BSP_ADC_WIDTH ADC_WIDTH_BIT_12
-#define BSP_ADC_ATTEN ADC_ATTEN_DB_11
+#define hadc              ADC_UNIT_1
+#define BSP_ADC_CHANNEL   ADC_CHANNEL_6
+#define BSP_ADC_WIDTH     ADC_WIDTH_BIT_12
+#define BSP_ADC_ATTEN     ADC_ATTEN_DB_11
 
 #define BSP_ADC_FILTER_SIZE 32
 /*------------------------------Exertn----------------------------------*/
-void bsp_adc_init(void);
+void bsp_adc_init( void );
 #endif // !BSP_ADC_H__
