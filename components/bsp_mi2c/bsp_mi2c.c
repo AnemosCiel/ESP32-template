@@ -18,16 +18,15 @@ static const char *TAG = "mi2c";
 * @return: null
 * @note:
 */
-esp_err_t bsp_mi2c_write( uint8_t address, uint8_t *data, size_t size )
+void bsp_mi2c_write( uint8_t address, uint8_t *data, size_t size )
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
     i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
     i2c_master_write( cmd, data, size, BSP_MI2C_ACK_EN );
     i2c_master_stop( cmd );
-    esp_err_t  ret = i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
+    i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
     i2c_cmd_link_delete( cmd );
-    return ret;
 }
 
 /**
@@ -36,11 +35,11 @@ esp_err_t bsp_mi2c_write( uint8_t address, uint8_t *data, size_t size )
 * @return: null
 * @note:
 */
-esp_err_t bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
+void bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
 {
     if( size == 0 )
     {
-        return ESP_OK;
+        return;
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
@@ -51,9 +50,8 @@ esp_err_t bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
     }
     i2c_master_read_byte( cmd, data + ( size - 1 ), I2C_MASTER_NACK );
     i2c_master_stop( cmd );
-    esp_err_t  ret = i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
+    i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
     i2c_cmd_link_delete( cmd );
-    return ret;
 }
 
 /**
@@ -62,7 +60,7 @@ esp_err_t bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
 * @return: null
 * @note:
 */
-esp_err_t bsp_mi2c_write_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size )
+void bsp_mi2c_write_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size )
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
@@ -70,9 +68,8 @@ esp_err_t bsp_mi2c_write_reg( uint8_t address, uint8_t reg, uint8_t *data, size_
     i2c_master_write_byte( cmd, reg, BSP_MI2C_ACK_EN );
     i2c_master_write( cmd, data, size, BSP_MI2C_ACK_EN );
     i2c_master_stop( cmd );
-    esp_err_t  ret = i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
+    i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
     i2c_cmd_link_delete( cmd );
-    return ret;
 }
 
 /**
@@ -81,11 +78,11 @@ esp_err_t bsp_mi2c_write_reg( uint8_t address, uint8_t reg, uint8_t *data, size_
 * @return: null
 * @note:
 */
-esp_err_t bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size )
+void bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size )
 {
     if( size == 0 )
     {
-        return ESP_OK;
+        return;
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
@@ -99,9 +96,8 @@ esp_err_t bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t
     }
     i2c_master_read_byte( cmd, data + ( size - 1 ), I2C_MASTER_NACK );
     i2c_master_stop( cmd );
-    esp_err_t  ret = i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
+    i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
     i2c_cmd_link_delete( cmd );
-    return ret;
 }
 
 /**
@@ -110,11 +106,11 @@ esp_err_t bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t
 * @return: null
 * @note:
 */
-esp_err_t bsp_mi2c_read_16bit_reg( uint8_t address, uint16_t reg, uint8_t *data, size_t size )
+void bsp_mi2c_read_16bit_reg( uint8_t address, uint16_t reg, uint8_t *data, size_t size )
 {
     if( size == 0 )
     {
-        return ESP_OK;
+        return;
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
@@ -129,9 +125,8 @@ esp_err_t bsp_mi2c_read_16bit_reg( uint8_t address, uint16_t reg, uint8_t *data,
     }
     i2c_master_read_byte( cmd, data + ( size - 1 ), I2C_MASTER_NACK );
     i2c_master_stop( cmd );
-    esp_err_t  ret = i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
+    i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
     i2c_cmd_link_delete( cmd );
-    return ret;
 }
 
 /**

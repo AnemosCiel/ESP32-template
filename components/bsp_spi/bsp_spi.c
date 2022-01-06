@@ -26,23 +26,20 @@ spi_device_handle_t hspi;
  * @return: null
  * @note:
  */
-esp_err_t bsp_spi_write( uint8_t *data, uint8_t len )
+void bsp_spi_write( uint8_t *data, uint8_t len )
 {
-    esp_err_t ret;
     spi_transaction_t transfer;
     if( len == 0 )
-        return ESP_ERR_INVALID_SIZE;        // no need to send anything
+        return;        // no need to send anything
     memset( &transfer, 0, sizeof( transfer ) ); // Zero out the transaction
     transfer.flags = SPI_TRANS_USE_TXDATA;
     transfer.length = len * 8;                  // Len is in bytes, transaction length is in bits.
     transfer.tx_buffer = data;                  // Data
     transfer.user = ( void * )1;                // D/C needs to be set to 1
-    ret = spi_device_transmit( hspi, &transfer ); // Transmit!
-    assert( ret == ESP_OK );                    // Should have had no issues.
+    spi_device_transmit( hspi, &transfer );     // Transmit!
 #if SPI_INFO
     ESP_LOGI( TAG, "send result: %d", ret );
 #endif
-    return ret;
 }
 
 /**
@@ -51,24 +48,21 @@ esp_err_t bsp_spi_write( uint8_t *data, uint8_t len )
  * @return: null
  * @note:
  */
-esp_err_t bsp_spi_read( uint8_t *data, uint8_t len )
+void bsp_spi_read( uint8_t *data, uint8_t len )
 {
-    esp_err_t ret;
     spi_transaction_t transfer;
     memset( &transfer, 0, sizeof( transfer ) );
     transfer.length = len * 8;
     transfer.flags = SPI_TRANS_USE_RXDATA;
     transfer.rx_buffer = data;
     transfer.user = ( void * )1; // D/C needs to be set to 1
-    ret = spi_device_transmit( hspi, &transfer );
-    assert( ret == ESP_OK );
+    spi_device_transmit( hspi, &transfer );
 #if SPI_INFO
     for( uint8_t i = 0; i < len; i++ )
     {
         ESP_LOGI( TAG, "send: %d", data[i] );
     }
 #endif
-    return ret;
 }
 
 /**
@@ -77,7 +71,7 @@ esp_err_t bsp_spi_read( uint8_t *data, uint8_t len )
  * @return: null
  * @note:
  */
-void bsp_spi_transfer( uint8_t *data, uint8_t *rxbuf, uint8_t len )
+void bsp_spi_transfer( uint8_t *txbuf, uint8_t *rxbuf, uint8_t len )
 {
     spi_transaction_t transfer =
     {
@@ -96,7 +90,7 @@ void bsp_spi_transfer( uint8_t *data, uint8_t *rxbuf, uint8_t len )
  * @return: null
  * @note:
  */
-void bsp_spi_transfer_polling( uint8_t *data, uint8_t *rxbuf, uint8_t len )
+void bsp_spi_transfer_polling( uint8_t *txbuf, uint8_t *rxbuf, uint8_t len )
 {
     spi_transaction_t transfer =
     {
@@ -117,7 +111,7 @@ void bsp_spi_transfer_polling( uint8_t *data, uint8_t *rxbuf, uint8_t len )
 */
 void bsp_spi_write_reg( uint8_t reg, uint8_t value )
 {
-    uint8_t out[2] = { reg, val };
+    uint8_t out[2] = { reg, value };
     uint8_t in[2];
     bsp_spi_transfer( out, in, 2 );
 }

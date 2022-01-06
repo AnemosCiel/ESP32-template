@@ -25,6 +25,7 @@
 #include "bsp_wifi.h"
 #include "bsp_spi.h"
 #include "bsp_adc.h"
+#include "bsp_pwm.h"
 
 QueueHandle_t uartQueue = NULL;
 SemaphoreHandle_t uartSemphr = NULL;
@@ -381,6 +382,7 @@ void user_init( void )
 {
     user_led_init();
     user_key_init();
+    bsp_pwm_init();
     // bsp_adc_init();
     // user_uart_init();
     // bsp_wifi_init();
