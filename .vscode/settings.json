@@ -5,8 +5,16 @@
     "array": "c",
     "string": "c",
     "string_view": "c",
-    "ledc.h": "c"
+    "ledc.h": "c",
+    "timers.h": "c",
+    "freertos.h": "c",
+    "condition_variable": "cpp",
+    "future": "cpp",
+    "multitimer.h": "c",
+    "timer.h": "c",
+    "timer_periph.h": "c"
   },
   "idf.adapterTargetName": "esp32",
-  "commentTranslate.source": "Google"
+  "commentTranslate.source": "Google",
+  "idf.portWin": "COM18"
 }
