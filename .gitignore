@@ -1,3 +1,4 @@
 ##ignore this file##
 build/
-.vscode
+.vscode/
+esp-idf/
