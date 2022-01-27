@@ -12,7 +12,9 @@
     "future": "cpp",
     "multitimer.h": "c",
     "timer.h": "c",
-    "timer_periph.h": "c"
+    "timer_periph.h": "c",
+    "gpio.h": "c",
+    "ets_sys.h": "c"
   },
   "idf.adapterTargetName": "esp32",
   "commentTranslate.source": "Google",

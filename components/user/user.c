@@ -13,6 +13,7 @@
 #include "driver/gpio.h"
 /* timer */
 #include "esp_system.h"
+#include "esp32/rom/ets_sys.h"
 #include "esp_timer.h"
 /* LowPower */
 #include "esp_sleep.h"
@@ -22,6 +23,7 @@
 /* log */
 #include "esp_log.h"
 /* bsp */
+#include "bsp_gpio.h"
 #include "bsp_wifi.h"
 #include "bsp_spi.h"
 #include "bsp_adc.h"
@@ -34,36 +36,6 @@ static QueueHandle_t edgeQueue = NULL;
 QueueHandle_t keyQueue = NULL;
 
 static const char *TAG = "user";
-
-/**
- * @description: get system tick since boot start
- * @param:  null
- * @return: system tick
- * @note:
- */
-int64_t user_get_systemtick( void )
-{
-    int64_t time_since_boot = esp_timer_get_time();
-#if TICK_INFO
-    ESP_LOGI( TAG, "Periodic timer called, time since boot: %lld us", time_since_boot );
-#endif
-    return time_since_boot;
-}
-
-/**
- * @description:
- * @param:  null
- * @return: null
- * @note:
- */
-int32_t user_get_runtime( int64_t start )
-{
-    int64_t stop = user_get_systemtick();
-    int64_t time = stop - start;
-    time = ( time < 0 ) ? ( -time ) + 0xFFFFFFFF / 2 : time;
-    ESP_LOGI( TAG, "Run time: %lld us", time );
-    return time;
-}
 
 /**
  * @description: led callback function
@@ -382,7 +354,9 @@ void user_init( void )
 {
     user_led_init();
     user_key_init();
-    bsp_pwm_init();
+    bsp_gpio_init();
+    bsp_gpio_square_wave();
+    // bsp_pwm_init();
     // bsp_adc_init();
     // user_uart_init();
     // bsp_wifi_init();
