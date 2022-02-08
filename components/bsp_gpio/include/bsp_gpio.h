@@ -22,9 +22,12 @@
 /*----------lib---------*/
 #include  <stdint.h>
 /*----------driver---------*/
+#include "driver/gpio.h"
 /*------------------------------Define----------------------------------*/
 
 /*------------------------------Exertn----------------------------------*/
-void bsp_gpio_init( void );
+void bsp_gpio_input( uint32_t gpio_num, gpio_pull_mode_t mode, gpio_int_type_t type, gpio_isr_t input_isr_callback );
+void bsp_gpio_outputPP( uint32_t gpio_num );
+void bsp_gpio_outputOD( uint32_t gpio_num );
 void bsp_gpio_square_wave( uint32_t pin, uint32_t numbers, uint32_t delay_us );
 #endif // !BSP_GPIO_H__

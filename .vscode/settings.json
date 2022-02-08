@@ -14,7 +14,17 @@
     "timer.h": "c",
     "timer_periph.h": "c",
     "gpio.h": "c",
-    "ets_sys.h": "c"
+    "ets_sys.h": "c",
+    "bsp_gpio.h": "c",
+    "optional": "c",
+    "istream": "c",
+    "ostream": "c",
+    "ratio": "c",
+    "system_error": "c",
+    "functional": "c",
+    "tuple": "c",
+    "type_traits": "c",
+    "utility": "c"
   },
   "idf.adapterTargetName": "esp32",
   "commentTranslate.source": "Google",

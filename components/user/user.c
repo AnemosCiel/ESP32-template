@@ -354,8 +354,6 @@ void user_init( void )
 {
     user_led_init();
     user_key_init();
-    bsp_gpio_init();
-    bsp_gpio_square_wave();
     // bsp_pwm_init();
     // bsp_adc_init();
     // user_uart_init();

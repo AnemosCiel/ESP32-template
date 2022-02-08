@@ -20,59 +20,63 @@
 /* log */
 #include "esp_log.h"
 
-static const char *TAG = "bsp_adc";
 
-/**
- * @description: Check that the TP two-point calibration value and the Vref reference voltage value are burned to eFuse
+ /**
+ * @description: 
  * @param:  null
  * @return: null
- * @note:
+ * @note: 
  */
-void bsp_adc_task( void *arg )
+void bsp_adc1_channel_init( adc1_channel_t channel )
 {
-    uint32_t adc_value = 0;
-    uint32_t voltage = 0;
-    int raw;
-    while( 1 )
-    {
-        for( uint8_t i = 0; i < BSP_ADC_FILTER_SIZE; i++ )
-        {
-            if( hadc == ADC_UNIT_1 )
-            {
-                raw = adc1_get_raw( ( adc1_channel_t )BSP_ADC_CHANNEL );
-            }
-            else
-            {
-                adc2_get_raw( ( adc2_channel_t )BSP_ADC_CHANNEL, BSP_ADC_WIDTH, &raw );
-            }
-            adc_value += raw;
-        }
-        adc_value /= BSP_ADC_FILTER_SIZE;
-        voltage = adc_value * 2600 / 4096;
-#if ADC_INFO
-        ESP_LOGI( TAG, "ADC:%d,Voltage value:%d mV\n", adc_value, voltage );
-#endif
-        vTaskDelay( pdMS_TO_TICKS( 1000 ) );
-    }
+    adc1_config_width( BSP_ADC_WIDTH );
+    adc1_config_channel_atten( BSP_ADC_CHANNEL, BSP_ADC_ATTEN );
 }
 
-/**
- * @description:
+ /**
+ * @description: 
  * @param:  null
  * @return: null
- * @note:
+ * @note: 
  */
-void bsp_adc_init( void )
+void bsp_adc2_channel_init( adc2_channel_t channel )
 {
-    /* Check if Two Point or Vref are burned into eFuse */
-    if( hadc == ADC_UNIT_1 )
-    {
-        adc1_config_width( BSP_ADC_WIDTH );
-        adc1_config_channel_atten( BSP_ADC_CHANNEL, BSP_ADC_ATTEN );
-    }
-    else
-    {
-        adc2_config_channel_atten( ( adc2_channel_t )BSP_ADC_CHANNEL, BSP_ADC_ATTEN );
-    }
-    xTaskCreate( bsp_adc_task, "adc_task", 1024 * 2, NULL, 10, NULL );
+    adc2_config_channel_atten( channel, BSP_ADC_ATTEN );
+}
+
+ /**
+ * @description: get adc1 channel value
+ * @param:  channel：adc channel
+ * @return: adc value
+ * @note: 
+ */
+int32_t bsp_adc1_getvalue( adc1_channel_t channel )
+{
+    int32_t value = 0;
+    value = adc1_get_raw( channel );
+    return value;
+}
+
+ /**
+ * @description: get adc2 channel value
+ * @param:  channel：adc channel
+ * @return: adc value
+ * @note: 
+ */
+int32_t bsp_adc2_getvalue( adc2_channel_t channel )
+{
+    int32_t value = 0;
+    adc2_get_raw( channel, BSP_ADC_WIDTH, &value );
+    return value;
+}
+
+ /**
+ * @description: 
+ * @param:  null
+ * @return: null
+ * @note: 
+ */
+int32_t bsp_adc_get_voltage( int32_t adc_value )
+{
+    return adc_value * 2600 / 4096;
 }
