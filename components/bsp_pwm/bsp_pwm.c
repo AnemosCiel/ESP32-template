@@ -16,36 +16,6 @@
 * @return: null
 * @note:
 */
-void bsp_pwm_start( uint8_t channel )
-{
-    if( channel >= LEDC_CHANNEL_MAX )
-    {
-        return;
-    }
-    bsp_pwm_set_duty( channel, ledc_get_duty( BSP_PWM_MODE, channel ) );
-}
-
-/**
-* @description:
-* @param:  null
-* @return: null
-* @note:
-*/
-void bsp_pwm_stop( uint8_t channel, uint8_t level )
-{
-    if( channel >= LEDC_CHANNEL_MAX )
-    {
-        return;
-    }
-    ledc_stop( BSP_PWM_MODE, channel, level );
-}
-
-/**
-* @description:
-* @param:  null
-* @return: null
-* @note:
-*/
 void bsp_pwm_set_freq( uint32_t frequency )
 {
     ledc_set_freq( BSP_PWM_MODE, BSP_PWM_TIMER, frequency );
@@ -113,6 +83,36 @@ void bsp_pwm_fade(uint8_t channel, uint32_t duty, uint32_t time )
     // Initialize fade service.
     ledc_fade_func_install(channel);
     ledc_set_fade_time_and_start(BSP_PWM_MODE, channel, ( duty * (1 << BSP_PWM_RESOLUTION) / 100 ), time, LEDC_FADE_NO_WAIT);
+}
+
+/**
+* @description:
+* @param:  null
+* @return: null
+* @note:
+*/
+void bsp_pwm_start( uint8_t channel )
+{
+    if( channel >= LEDC_CHANNEL_MAX )
+    {
+        return;
+    }
+    bsp_pwm_set_duty( channel, ledc_get_duty( BSP_PWM_MODE, channel ) );
+}
+
+/**
+* @description:
+* @param:  null
+* @return: null
+* @note:
+*/
+void bsp_pwm_stop( uint8_t channel, uint8_t level )
+{
+    if( channel >= LEDC_CHANNEL_MAX )
+    {
+        return;
+    }
+    ledc_stop( BSP_PWM_MODE, channel, level );
 }
 
 /**

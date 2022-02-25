@@ -6,7 +6,9 @@
 #include  <stdint.h>
 /*----------driver---------*/
 /*------------------------------Define----------------------------------*/
-
+#define BSP_MCPWM_FREQUENCY     10000
+#define BSP_MCPWM_COUNTER_MODE  MCPWM_UP_DOWN_COUNTER
+#define BSP_MCPWM_DUTY_MODE     MCPWM_DUTY_MODE_0
 /*------------------------------Exertn----------------------------------*/
 void bsp_mcpwm_register(uint8_t unit, uint8_t channel, uint8_t pin);
 void bsp_mcpwm_registerAB(uint8_t uint, uint8_t pinA, uint8_t pinB);

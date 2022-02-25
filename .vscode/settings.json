@@ -29,7 +29,12 @@
     "*.inc": "c",
     "esp_system.h": "c",
     "user.h": "c",
-    "usystem.h": "c"
+    "usystem.h": "c",
+    "mcpwm.h": "c",
+    "bsp_mcpwm.h": "c",
+    "complex": "c",
+    "chrono": "c",
+    "algorithm": "c"
   },
   "idf.adapterTargetName": "esp32",
   "commentTranslate.source": "Google",
