@@ -42,7 +42,7 @@ void bsp_mcpwm_registerAB(uint8_t unit, uint8_t pinA, uint8_t pinB)
         .frequency = 10000, // frequency = 50Hz
         .cmpr_a = 0,     // duty cycle of PWMxA = 0
         .cmpr_b = 0,
-        .counter_mode = MCPWM_UP_COUNTER,   // Up counter
+        .counter_mode = MCPWM_UP_DOWN_COUNTER,   // Up-Down counter
         .duty_mode = MCPWM_DUTY_MODE_0,     // Active HIGH
     };
     mcpwm_init(unit, unit, &pwm_config);
