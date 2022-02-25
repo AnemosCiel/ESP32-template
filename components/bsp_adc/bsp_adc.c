@@ -27,10 +27,14 @@
  * @return: null
  * @note: 
  */
-void bsp_adc1_channel_init( adc1_channel_t channel )
+void bsp_adc1_channel_init( uint8_t channel )
 {
+    if(channel > ADC1_CHANNEL_MAX)
+    {
+        return;
+    }
     adc1_config_width( BSP_ADC_WIDTH );
-    adc1_config_channel_atten( BSP_ADC_CHANNEL, BSP_ADC_ATTEN );
+    adc1_config_channel_atten( channel, BSP_ADC_ATTEN );
 }
 
  /**
@@ -39,8 +43,12 @@ void bsp_adc1_channel_init( adc1_channel_t channel )
  * @return: null
  * @note: 
  */
-void bsp_adc2_channel_init( adc2_channel_t channel )
+void bsp_adc2_channel_init( uint8_t channel )
 {
+    if(channel > ADC2_CHANNEL_MAX)
+    {
+        return;
+    }
     adc2_config_channel_atten( channel, BSP_ADC_ATTEN );
 }
 
@@ -50,9 +58,14 @@ void bsp_adc2_channel_init( adc2_channel_t channel )
  * @return: adc value
  * @note: 
  */
-int32_t bsp_adc1_getvalue( adc1_channel_t channel )
+int32_t bsp_adc1_getvalue( uint8_t channel )
 {
     int32_t value = 0;
+
+    if(channel > ADC1_CHANNEL_MAX)
+    {
+        return 0;
+    }
     value = adc1_get_raw( channel );
     return value;
 }
@@ -63,9 +76,14 @@ int32_t bsp_adc1_getvalue( adc1_channel_t channel )
  * @return: adc value
  * @note: 
  */
-int32_t bsp_adc2_getvalue( adc2_channel_t channel )
+int32_t bsp_adc2_getvalue( uint8_t channel )
 {
     int32_t value = 0;
+
+    if(channel > ADC2_CHANNEL_MAX)
+    {
+        return 0;
+    }
     adc2_get_raw( channel, BSP_ADC_WIDTH, &value );
     return value;
 }

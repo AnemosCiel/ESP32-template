@@ -36,7 +36,6 @@
 #define KEY_INFO    1
 #define UART_INFO   0
 #define TASK_INFO   1
-#define TICK_INFO   1
 /* Deep sleep */
 #define DEEPSLEEP_TIME 10 // unit: second
 /***********led***********/
@@ -77,6 +76,4 @@ extern SemaphoreHandle_t uartSemphr;
 
 void user_init( void );
 void user_uart_sendstr( char *data );
-int64_t user_get_systemtick( void );
-int32_t user_get_runtime( int64_t star );
 #endif // !__USER_H/

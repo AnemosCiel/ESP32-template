@@ -6,7 +6,7 @@
  */
 #include <stdio.h>
 #include "bsp_pwm.h"
-
+#include "usystem.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -59,12 +59,9 @@ void bsp_pwm_set_freq( uint32_t frequency )
 */
 void bsp_pwm_set_duty( uint8_t channel, uint8_t duty )
 {
-    if( duty > 100 )
-    {
-        duty = 100;
-    }
+    uint8_t tempduty = MAX(duty,100);
     // Set duty
-    ESP_ERROR_CHECK( ledc_set_duty( BSP_PWM_MODE, channel, ( duty * (1 << BSP_PWM_RESOLUTION) / 100 ) ) );
+    ESP_ERROR_CHECK( ledc_set_duty( BSP_PWM_MODE, channel, ( tempduty * (1 << BSP_PWM_RESOLUTION) / 100 ) ) );
     // Update duty to apply the new value
     ESP_ERROR_CHECK( ledc_update_duty( BSP_PWM_MODE, channel ) );
 }
@@ -126,5 +123,10 @@ void bsp_pwm_fade(uint8_t channel, uint32_t duty, uint32_t time )
 */
 void bsp_pwm_init( void )
 {
+    /* Example:
+    bsp_pwm_register(4, 0);
+    bsp_pwm_start(0);
+    bsp_pwm_set_duty(0, 20);
+    */
     
 }

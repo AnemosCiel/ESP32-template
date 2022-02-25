@@ -60,9 +60,9 @@
 
 #define BSP_ADC_FILTER_SIZE 32
 /*------------------------------Exertn----------------------------------*/
-void bsp_adc1_channel_init( adc1_channel_t channel );
-void bsp_adc2_channel_init( adc2_channel_t channel );
-int32_t bsp_adc1_getvalue( adc1_channel_t channel );
-int32_t bsp_adc2_getvalue( adc2_channel_t channel );
+void bsp_adc1_channel_init( uint8_t channel );
+void bsp_adc2_channel_init( uint8_t channel );
+int32_t bsp_adc1_getvalue( uint8_t channel );
+int32_t bsp_adc2_getvalue( uint8_t channel );
 int32_t bsp_adc_get_voltage( int32_t adc_value );
 #endif // !BSP_ADC_H__

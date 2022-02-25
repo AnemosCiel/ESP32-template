@@ -5,6 +5,7 @@
  * @Path: D:\ESP32\template\components\src\user.c
  */
 #include "user.h"
+#include "usystem.h"
 /***********driver***********/
 /* uart */
 #include "driver/uart.h"
@@ -28,6 +29,7 @@
 #include "bsp_spi.h"
 #include "bsp_adc.h"
 #include "bsp_pwm.h"
+#include "bsp_mcpwm.h"
 
 QueueHandle_t uartQueue = NULL;
 SemaphoreHandle_t uartSemphr = NULL;
@@ -56,7 +58,7 @@ static void user_led_callback( void *arg )
  * @return: null
  * @note:
  */
-static void user_led_init( void )
+void user_led_init( void )
 {
     /* simple way
     gpio_pad_select_gpio(hled);
@@ -185,10 +187,7 @@ void user_key_init( void )
  */
 void user_uart_sendstr( char *data )
 {
-    uint32_t txbytes = uart_write_bytes( huart, data, strlen( data ) );
-#if UART_INFO
-    ESP_LOGI( TAG, "Wrote %d bytes", txbytes );
-#endif
+    uart_write_bytes( huart, data, strlen( data ) );
     uart_write_bytes( huart, "\r\n", 2 );
 }
 
@@ -280,7 +279,7 @@ void user_uart_task( void *arg )
  * @return: null
  * @note:
  */
-static void user_uart_init( void )
+void user_uart_init( void )
 {
     uart_config_t uart_config =
     {
@@ -352,9 +351,10 @@ void user_task( void *arg )
  */
 void user_init( void )
 {
-    user_led_init();
-    user_key_init();
+    // user_led_init();
+    // user_key_init();
     // bsp_pwm_init();
+    // bsp_mcpwm_init();
     // bsp_adc_init();
     // user_uart_init();
     // bsp_wifi_init();
