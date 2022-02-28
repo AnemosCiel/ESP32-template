@@ -30,6 +30,7 @@
 #include "bsp_adc.h"
 #include "bsp_pwm.h"
 #include "bsp_mcpwm.h"
+#include "bsp_now.h"
 
 QueueHandle_t uartQueue = NULL;
 SemaphoreHandle_t uartSemphr = NULL;
@@ -357,7 +358,8 @@ void user_init( void )
     // bsp_mcpwm_init();
     // bsp_adc_init();
     // user_uart_init();
-    // bsp_wifi_init();
+    bsp_wifi_init();
+    bsp_now_init();
     // user_lowpwoer();
 #if TASK_INFO
     /* Show task info */
