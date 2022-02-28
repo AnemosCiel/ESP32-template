@@ -34,9 +34,12 @@
     "bsp_mcpwm.h": "c",
     "complex": "c",
     "chrono": "c",
-    "algorithm": "c"
+    "algorithm": "c",
+    "esp_now.h": "c",
+    "task.h": "c",
+    "*.ipp": "c"
   },
   "idf.adapterTargetName": "esp32",
-  "commentTranslate.source": "Google",
-  "idf.portWin": "COM18"
+  "commentTranslate.source": "Bing",
+  "idf.portWin": "COM11"
 }
