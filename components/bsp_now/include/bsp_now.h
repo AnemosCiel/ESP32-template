@@ -45,13 +45,14 @@ ESP-NOW Data is transmitted using action frames from each vendor, with a default
 #define BSP_ESPNOW_WIFI_IF   ESP_IF_WIFI_STA
 #endif
 
+#define BSP_ESPNOW_PAYLOAD_LEN  (238)
+
 #define BSP_ESPNOW_CHANNEL  1
 
 #define BSP_ESPNOW_PMK "pmk1234567890123" // ESPNOW primary master use. The length of ESPNOW primary master must be 16 bytes.
 #define BSP_ESPNOW_LMK "lmk1234567890123" // ESPNOW primary master use. The length of ESPNOW local master must be 16 bytes.
 
-#define BSP_ESPNOW_MACADDR_SIZE 6
-#define BSP_ESPNOW_QUEUE_SIZE   6
+#define BSP_ESPNOW_QUEUE_SIZE 6
 
 enum {
     ESPNOW_DATA_BROADCAST,
@@ -63,23 +64,23 @@ enum {
 typedef struct {
     uint8_t type;                         //Broadcast or unicast ESPNOW data.
     uint8_t state;                        //Indicate that if has received broadcast ESPNOW data or not.
-    uint8_t *data;                      //Buffer pointing to ESPNOW data.
+    uint8_t *data;                        //Buffer pointing to ESPNOW data.
     int len;                              //Length of ESPNOW data to be sent, unit: byte.
     uint16_t seq_num;                     //Sequence number of ESPNOW data.
     uint16_t crc;                         //CRC16 value of ESPNOW data.
     uint32_t magic;                       //Magic number which is used to determine which device to send unicast ESPNOW data.
     uint8_t payload[0];                   //Real payload of ESPNOW data.
-    uint8_t sender_mac[6];   //MAC address of target device.
+    uint8_t sender_mac[6];                //MAC address of target device.
 }  espnow_recv_packet_t;
 
 /* Parameters of sending ESPNOW data. */
 typedef struct {
-    uint8_t status;                        //Indicate that if has received broadcast ESPNOW data or not.
+    uint8_t status;                       //Indicate that if has received broadcast ESPNOW data or not.
     uint8_t id;
-    uint32_t resend;                       //
-    uint8_t *data;                      //Buffer pointing to ESPNOW data.
+    uint32_t resend;                      //
+    uint8_t *data;                        //Buffer pointing to ESPNOW data.
     int len;                              //Length of ESPNOW data to be sent, unit: byte.
-    uint8_t target_mac[6];   //MAC address of target device.
+    uint8_t target_mac[6];                //MAC address of target device.
 } espnow_send_packet_t;
 
 /*------------------------------Exertn----------------------------------*/

@@ -13,8 +13,14 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 
+#include "esp_wifi.h"
 #include "esp_crc.h"
 #include "esp_log.h"
+
+#define SEND_CB_OK               BIT0
+#define SEND_CB_FAIL             BIT1
+#define BSP_ESPNOW_OUI_LEN          (2)
+#define BSP_ESPNOW_SEND_RETRY_NUM   (3)
 
 static uint8_t target_addr[ESP_NOW_ETH_ALEN] = {0xc4, 0x5b, 0xbe, 0x3f, 0x5b, 0x44};
 
@@ -24,7 +30,6 @@ static espnow_send_packet_t send_packet;
 static espnow_recv_packet_t recv_packet;
 
 static const char *TAG = "espnow";
-static uint8_t test[] = "hello";
 
 /**
 * @description: ESPNOW sending callback function is called in WiFi task.
@@ -36,14 +41,23 @@ static void espnow_send_callback( const uint8_t *mac_addr, esp_now_send_status_t
 {
     if( mac_addr == NULL )
     {
-        ESP_LOGE( TAG, "Send cb arg error" );
+        ESP_LOGI( TAG, "Send callback: mac addr is NULL" );
         return;
     }
-    memcpy( send_packet.target_mac, mac_addr, ESP_NOW_ETH_ALEN );
-    send_packet.status = status;
-    if( xQueueSend( espnow_send_queue, &send_packet, 0 ) != pdTRUE )
+
+    if( status == ESP_NOW_SEND_SUCCESS )
     {
-        ESP_LOGW( TAG, "Send send queue fail" );
+        // Send success event or queue
+        memcpy( send_packet.target_mac, mac_addr, ESP_NOW_ETH_ALEN );
+        send_packet.status = status;
+        if( xQueueSend( espnow_send_queue, &send_packet, 0 ) != pdTRUE )
+        {
+            ESP_LOGI( TAG, "Send send queue fail" );
+        }
+    }
+    else
+    {
+        // Send faild event or queue
     }
 }
 
@@ -55,17 +69,33 @@ static void espnow_send_callback( const uint8_t *mac_addr, esp_now_send_status_t
 */
 static void espnow_recv_callback( const uint8_t *mac_addr, const uint8_t *data, int len )
 {
-    if( mac_addr == NULL || data == NULL || len <= 0 )
+    if( mac_addr == NULL || data == NULL || len < sizeof(espnow_recv_packet_t) )
     {
-        ESP_LOGE( TAG, "Receive cb arg error" );
+        ESP_LOGI( TAG, "Receive callback args error" );
         return;
     }
+
+    espnow_recv_packet_t *espnow_data = (espnow_recv_packet_t *)data;
+    //Queue Create
+    if (espnow_data->crc != esp_crc8_le(UINT8_MAX, espnow_data->payload, espnow_data->len)) 
+    {
+        ESP_LOGI( TAG, "Receive cb CRC fail");
+        return;
+    }
+
+    /**< espnow_queue is full */
+    if (!uxQueueSpacesAvailable(espnow_recv_queue)) 
+    {
+        ESP_LOGI( TAG, "espnow_queue is full");
+        return ;
+    }
+
     memcpy( &recv_packet.sender_mac, mac_addr, ESP_NOW_ETH_ALEN );
     memcpy( &recv_packet.data, data, len);
     recv_packet.len = len;
     if( xQueueSend( espnow_recv_queue, &recv_packet, 0 ) != pdTRUE )
     {
-        ESP_LOGW( TAG, "Send receive queue fail" );
+        ESP_LOGI( TAG, "Send receive queue fail" );
     }
 }
 
@@ -107,7 +137,7 @@ static void espnow_data_prepare( void )
 }
 
 /**
-* @description:
+* @description: Send fifo data
 * @param:  null
 * @return: null
 * @note:
@@ -118,6 +148,7 @@ static void espnow_send_task( void *arg )
     
     espnow_send_packet_t packte;
     memset(&packte, 0, sizeof( espnow_send_packet_t));
+    uint8_t test[] = "hello";
 
     while( 1 )
     {
@@ -141,12 +172,12 @@ static void espnow_send_task( void *arg )
                 }
             }
         }
-        vTaskDelay( pdMS_TO_TICKS(1000));
+        vTaskDelay( pdMS_TO_TICKS(1000) );
     }
 }
 
  /**
- * @description: 
+ * @description: Receive data to list
  * @param:  null
  * @return: null
  * @note: 
@@ -156,28 +187,51 @@ static void espnow_recv_task(void *arg)
     ESP_LOGI( TAG, "Start espnow recive task." );
 
     espnow_recv_packet_t packte;
-    memset(&packte, 0, sizeof( espnow_recv_packet_t));
+    memset(&packte, 0, sizeof(espnow_recv_packet_t));
     
     while( 1 )
     {
         if (xQueueReceive( espnow_recv_queue, &packte, portMAX_DELAY ) == pdTRUE) 
         {
             ESP_LOGI(TAG, "Receive broadcast data from: "MACSTR", len: %d", MAC2STR(packte.sender_mac), packte.len);
-            // espnow_data_parse();
-            // /* If MAC address does not exist in peer list, add it to peer list. */
-            // if (esp_now_is_peer_exist(packte.sender_mac) == false) 
-            // {
-            //     esp_now_peer_info_t peer_info;
-            //     memset(&peer_info, 0, sizeof(esp_now_peer_info_t));
-            //     memcpy(peer_info.peer_addr, packte.sender_mac, ESP_NOW_ETH_ALEN);
-            //     memcpy(peer_info.lmk, BSP_ESPNOW_LMK, ESP_NOW_KEY_LEN);
-            //     peer_info.channel = BSP_ESPNOW_CHANNEL;
-            //     peer_info.ifidx = BSP_ESPNOW_WIFI_IF;
-            //     peer_info.encrypt = true;
-            //     esp_now_add_peer(&peer_info);
-            // }
+            // TODO
         }
     }
+}
+
+ /**
+ * @description: Write data to fifo
+ * @param:  null
+ * @return: null
+ * @note: 
+ */
+void bsp_now_write(uint8_t *mac_addr, uint8_t *data, uint8_t len)
+{
+    ESP_ERROR_CHECK(mac_addr);
+    ESP_ERROR_CHECK(data);
+    ESP_ERROR_CHECK(len > 0);
+
+    //TODO
+}
+
+ /**
+ * @description: Read data from list
+ * @param:  null
+ * @return: null
+ * @note: 
+ */
+void mespnow_read(uint8_t *mac_addr, void *data, size_t *len, TickType_t wait_ticks)
+{
+    ESP_ERROR_CHECK(mac_addr);
+    ESP_ERROR_CHECK(data);
+    ESP_ERROR_CHECK(len && *len > 0);
+
+    // uint32_t start_ticks            = xTaskGetTickCount();
+    // ssize_t read_size               = 0;
+    // size_t total_size               = 0;
+    // TickType_t recv_ticks           = 0;
+
+    //TODO
 }
 
  /**
@@ -186,9 +240,45 @@ static void espnow_recv_task(void *arg)
  * @return: null
  * @note: 
  */
-void bsp_now_send_data(uint8_t *data, uint8_t len)
+void bsp_now_add_peer(wifi_interface_t *interface, const uint8_t *addr, const uint8_t *lmk)
 {
-    
+    if(esp_now_is_peer_exist(addr))
+    {
+        ESP_ERROR_CHECK(esp_now_del_peer(addr));
+        return;
+    }
+
+    esp_now_peer_info_t peer = {0};
+    wifi_second_chan_t sec_channel = 0;
+
+    esp_wifi_get_channel(&peer.channel, &sec_channel);
+    if(lmk)
+    {
+        peer.encrypt = true;
+        memcpy(peer.lmk, lmk, ESP_NOW_KEY_LEN);
+    }
+    peer.ifidx = *interface;
+    memcpy(peer.peer_addr, addr, ESP_NOW_ETH_ALEN);
+
+    ESP_ERROR_CHECK(esp_now_add_peer(&peer));
+}
+
+ /**
+ * @description: 
+ * @param:  null
+ * @return: null
+ * @note: 
+ */
+void bsp_now_del_peer(const uint8_t *addr)
+{
+    esp_err_t ret;
+
+    if (esp_now_is_peer_exist(addr)) 
+    {
+        ret = esp_now_del_peer(addr);
+        ESP_ERROR_CHECK(ret != ESP_OK);
+        ESP_LOGI( TAG, "esp_now_del_peer fail, ret: %d", ret);
+    }
 }
 
  /**
@@ -208,26 +298,16 @@ void bsp_now_init(void)
     ESP_ERROR_CHECK( esp_now_set_pmk((const uint8_t *)BSP_ESPNOW_PMK) );
 
     /* Add broadcast peer information to peer list. */
-    esp_now_peer_info_t peer_info;
-    memset(&peer_info, 0, sizeof(esp_now_peer_info_t));
-    memcpy(peer_info.peer_addr,target_addr, ESP_NOW_ETH_ALEN);
-    // memcpy(peer_info.lmk, BSP_ESPNOW_LMK, ESP_NOW_KEY_LEN);
-    peer_info.channel = BSP_ESPNOW_CHANNEL;
-    peer_info.ifidx = BSP_ESPNOW_WIFI_IF;
-    peer_info.encrypt = false;
-    esp_now_add_peer(&peer_info);
+    bsp_now_add_peer(BSP_ESPNOW_WIFI_IF, target_addr, 0);
 
-#if (BSP_NOW_MASTER)
-    espnow_recv_queue = xQueueCreate(BSP_ESPNOW_QUEUE_SIZE, sizeof(espnow_recv_packet_t));
     xTaskCreate(espnow_recv_task, "espnow receive task", 2048, NULL, 4, NULL);
-#else
+
     espnow_send_queue = xQueueCreate(BSP_ESPNOW_QUEUE_SIZE, sizeof(espnow_send_packet_t));
     xTaskCreate(espnow_send_task, "espnow send task", 2048, NULL, 4, NULL);
-    if( esp_now_send(target_addr, test, sizeof(test)) != ESP_OK )
-    {
-        ESP_LOGE(TAG, "Send error");
-    }
-#endif
+    // if( esp_now_send(target_addr, "test", sizeof(test)) != ESP_OK )
+    // {
+    //     ESP_LOGE(TAG, "Send error");
+    // }
 }
 
  /**
@@ -239,7 +319,6 @@ void bsp_now_init(void)
 void bsp_now_deinit(void)
 {
     vSemaphoreDelete(espnow_send_queue);
-    vSemaphoreDelete(espnow_recv_queue);
     vTaskDelete(&espnow_send_task);
     vTaskDelete(&espnow_recv_task);
     esp_now_deinit();

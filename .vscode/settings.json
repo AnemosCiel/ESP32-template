@@ -37,9 +37,14 @@
     "algorithm": "c",
     "esp_now.h": "c",
     "task.h": "c",
-    "*.ipp": "c"
+    "*.ipp": "c",
+    "initializer_list": "c",
+    "bt_common.h": "c",
+    "list.h": "c",
+    "stdbool.h": "c",
+    "bsp_mi2c.h": "c"
   },
   "idf.adapterTargetName": "esp32",
   "commentTranslate.source": "Bing",
-  "idf.portWin": "COM11"
+  "idf.portWin": "COM18"
 }
