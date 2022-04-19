@@ -10,6 +10,11 @@
 #include "esp_log.h"
 #include "driver/i2c.h"
 
+#define hi2c   I2C_MODE_MASTER
+#define BSP_MI2C_TXBUF_SIZE 10
+#define BSP_MI2C_RXBUF_SIZE 10
+#define BSP_MI2C_TIMEOUT 10
+
 static const char *TAG = "mi2c";
 
 /**
@@ -18,11 +23,11 @@ static const char *TAG = "mi2c";
 * @return: null
 * @note:
 */
-void bsp_mi2c_write( uint8_t address, uint8_t *data, size_t size )
+void bsp_mi2c_write( uint8_t dev_addr, uint8_t *data, size_t size )
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
     i2c_master_write( cmd, data, size, BSP_MI2C_ACK_EN );
     i2c_master_stop( cmd );
     i2c_master_cmd_begin( hi2c, cmd, BSP_MI2C_TIMEOUT );
@@ -35,7 +40,7 @@ void bsp_mi2c_write( uint8_t address, uint8_t *data, size_t size )
 * @return: null
 * @note:
 */
-void bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
+void bsp_mi2c_read( uint8_t dev_addr, uint8_t *data, size_t size )
 {
     if( size == 0 )
     {
@@ -43,7 +48,7 @@ void bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_READ ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_READ ), BSP_MI2C_ACK_EN );
     if( size > 1 )
     {
         i2c_master_read( cmd, data, size - 1, I2C_MASTER_ACK );
@@ -60,11 +65,11 @@ void bsp_mi2c_read( uint8_t address, uint8_t *data, size_t size )
 * @return: null
 * @note:
 */
-void bsp_mi2c_write_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size )
+void bsp_mi2c_write_reg( uint8_t dev_addr, uint8_t reg, uint8_t *data, size_t size )
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
     i2c_master_write_byte( cmd, reg, BSP_MI2C_ACK_EN );
     i2c_master_write( cmd, data, size, BSP_MI2C_ACK_EN );
     i2c_master_stop( cmd );
@@ -78,7 +83,7 @@ void bsp_mi2c_write_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t siz
 * @return: null
 * @note:
 */
-void bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size )
+void bsp_mi2c_read_reg( uint8_t dev_addr, uint8_t reg, uint8_t *data, size_t size )
 {
     if( size == 0 )
     {
@@ -86,10 +91,10 @@ void bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
     i2c_master_write_byte( cmd, reg, BSP_MI2C_ACK_EN );
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_READ ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_READ ), BSP_MI2C_ACK_EN );
     if( size > 1 )
     {
         i2c_master_read( cmd, data, size - 1, I2C_MASTER_ACK );
@@ -106,7 +111,7 @@ void bsp_mi2c_read_reg( uint8_t address, uint8_t reg, uint8_t *data, size_t size
 * @return: null
 * @note:
 */
-void bsp_mi2c_read_16bit_reg( uint8_t address, uint16_t reg, uint8_t *data, size_t size )
+void bsp_mi2c_read_16bit_reg( uint8_t dev_addr, uint16_t reg, uint8_t *data, size_t size )
 {
     if( size == 0 )
     {
@@ -114,11 +119,11 @@ void bsp_mi2c_read_16bit_reg( uint8_t address, uint16_t reg, uint8_t *data, size
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_WRITE ), BSP_MI2C_ACK_EN );
     i2c_master_write_byte( cmd, ( reg >> 8 ), BSP_MI2C_ACK_EN );
     i2c_master_write_byte( cmd, ( reg & 0xFF ), BSP_MI2C_ACK_EN );
     i2c_master_start( cmd );
-    i2c_master_write_byte( cmd, ( ( address << 1 ) | BSP_MI2C_READ ), BSP_MI2C_ACK_EN );
+    i2c_master_write_byte( cmd, ( ( dev_addr << 1 ) | BSP_MI2C_READ ), BSP_MI2C_ACK_EN );
     if( size > 1 )
     {
         i2c_master_read( cmd, data, size - 1, I2C_MASTER_ACK );
@@ -135,16 +140,16 @@ void bsp_mi2c_read_16bit_reg( uint8_t address, uint16_t reg, uint8_t *data, size
 * @return: null
 * @note:
 */
-void bsp_mi2c_init( void )
+void bsp_mi2c_init( uint32_t scl, uint32_t sda, uint32_t frequency )
 {
     i2c_config_t config =
     {
         .mode = hi2c,
-        .sda_io_num = BSP_MI2C_SDA,
+        .sda_io_num = sda,
         .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_io_num = BSP_MI2C_SCL,
+        .scl_io_num = scl,
         .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = BSP_MI2C_FREQ,
+        .master.clk_speed = frequency,
     };
     i2c_param_config( hi2c, &config );
     i2c_driver_install( hi2c, config.mode, BSP_MI2C_RXBUF_SIZE, BSP_MI2C_TXBUF_SIZE, 0 );
