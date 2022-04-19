@@ -54,11 +54,6 @@
 /*----------driver---------*/
 /*------------------------------Define----------------------------------*/
 #define ADC_INFO          1
-
-#define BSP_ADC_WIDTH     ADC_WIDTH_BIT_12
-#define BSP_ADC_ATTEN     ADC_ATTEN_DB_11
-
-#define BSP_ADC_FILTER_SIZE 32
 /*------------------------------Exertn----------------------------------*/
 void bsp_adc1_channel_init( uint8_t channel );
 void bsp_adc2_channel_init( uint8_t channel );
