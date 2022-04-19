@@ -1,6 +1,6 @@
 #ifndef __BSP_GPIO_H__
 #define __BSP_GPIO_H__
-/*
+/* ESP-IDF
 *simple way:
 *    gpio_pad_select_gpio( pin );
 *    gpio_reset_pin( pin );
@@ -24,10 +24,29 @@
 /*----------driver---------*/
 #include "driver/gpio.h"
 /*------------------------------Define----------------------------------*/
+typedef enum{
+    FLOATING,
+    PULLUP,
+    PULLDOWN,
+}bsp_iopull_mode_t;
+
+typedef enum{
+    DISABLE,
+    RISING,
+    FALLING,
+}bsp_ioint_type_t;
+
+#ifndef NULL
+#define NULL ((void *)0)
+
+typedef void (*bsp_ioisr_t)(void *);
 
 /*------------------------------Exertn----------------------------------*/
-void bsp_gpio_input( uint32_t gpio_num, gpio_pull_mode_t mode, gpio_int_type_t type, gpio_isr_t input_isr_callback );
+void bsp_gpio_input( uint32_t gpio_num, bsp_iopull_mode_t mode, bsp_ioint_type_t type, bsp_ioisr_t input_isr_callback );
 void bsp_gpio_outputPP( uint32_t gpio_num );
 void bsp_gpio_outputOD( uint32_t gpio_num );
-void bsp_gpio_square_wave( uint32_t pin, uint32_t numbers, uint32_t delay_us );
+void bsp_gpio_reset(uint32_t gpio_num);
+void bsp_gpio_write(uint32_t gpio_num, uint8_t state);
+uint8_t bsp_gpio_read(uint32_t gpio_num);
+void bsp_gpio_toogle(uint32_t gpio_num);
 #endif // !BSP_GPIO_H__
