@@ -1,6 +1,6 @@
 #ifndef __BSP_GPIO_H__
 #define __BSP_GPIO_H__
-/* ESP-IDF
+/*
 *simple way:
 *    gpio_pad_select_gpio( pin );
 *    gpio_reset_pin( pin );
@@ -38,6 +38,7 @@ typedef enum{
 
 #ifndef NULL
 #define NULL ((void *)0)
+#endif
 
 typedef void (*bsp_ioisr_t)(void *);
 

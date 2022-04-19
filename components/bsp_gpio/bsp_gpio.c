@@ -33,7 +33,7 @@ static void bsp_gpio_input_handler(void *arg)
  * @return: null
  * @note:
  */
-void bsp_gpio_input(uint32_t gpio_num, gpio_pull_mode_t mode, gpio_int_type_t type, gpio_isr_t input_isr_callback)
+void bsp_gpio_input( uint32_t gpio_num, bsp_iopull_mode_t mode, bsp_ioint_type_t type, bsp_ioisr_t input_isr_callback )
 {
     gpio_pad_select_gpio(gpio_num);
     gpio_set_direction(gpio_num, GPIO_MODE_INPUT);
@@ -131,7 +131,7 @@ uint8_t bsp_gpio_read(uint32_t gpio_num)
  */
 void bsp_gpio_toogle(uint32_t gpio_num)
 {
-    static uint8_t state = bsp_gpio_read(gpio_num);
+    uint8_t state = bsp_gpio_read(gpio_num);
     bsp_gpio_write(gpio_num, !state);
 }
 
