@@ -85,6 +85,7 @@ void bsp_gpio_outputPP(uint32_t gpio_num)
     gpio_pad_select_gpio(gpio_num);
     gpio_reset_pin(gpio_num);
     gpio_set_direction(gpio_num, GPIO_MODE_OUTPUT);
+    gpio_set_pull_mode(gpio_num, GPIO_FLOATING);
 }
 
 /**
@@ -98,6 +99,21 @@ void bsp_gpio_outputOD(uint32_t gpio_num)
     gpio_pad_select_gpio(gpio_num);
     gpio_reset_pin(gpio_num);
     gpio_set_direction(gpio_num, GPIO_MODE_OUTPUT_OD);
+    gpio_set_pull_mode(gpio_num, GPIO_FLOATING);
+}
+
+ /**
+ * @description: 
+ * @param:  null
+ * @return: null
+ * @note: 
+ */
+void bsp_gpio_inout(uint32_t gpio_num)
+{
+    gpio_pad_select_gpio(gpio_num);
+    gpio_reset_pin(gpio_num);
+    gpio_set_direction(gpio_num, GPIO_MODE_INPUT_OUTPUT);
+    gpio_set_pull_mode(gpio_num, GPIO_FLOATING);
 }
 
 /**
@@ -127,7 +143,7 @@ uint8_t bsp_gpio_read(uint32_t gpio_num)
  * @description: Toogle gpio level
  * @param:  gpio_num：gpio pin number
  * @return: null
- * @note:
+ * @note: The gpio must set be input and output, if not, read will always be 0
  */
 void bsp_gpio_toogle(uint32_t gpio_num)
 {

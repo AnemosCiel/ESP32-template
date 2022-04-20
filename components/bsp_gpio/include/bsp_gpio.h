@@ -46,6 +46,7 @@ typedef void (*bsp_ioisr_t)(void *);
 void bsp_gpio_input( uint32_t gpio_num, bsp_iopull_mode_t mode, bsp_ioint_type_t type, bsp_ioisr_t input_isr_callback );
 void bsp_gpio_outputPP( uint32_t gpio_num );
 void bsp_gpio_outputOD( uint32_t gpio_num );
+void bsp_gpio_inout(uint32_t gpio_num);
 void bsp_gpio_reset(uint32_t gpio_num);
 void bsp_gpio_write(uint32_t gpio_num, uint8_t state);
 uint8_t bsp_gpio_read(uint32_t gpio_num);
