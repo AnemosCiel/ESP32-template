@@ -1,5 +1,5 @@
 {
-  "C_Cpp.intelliSenseEngine": "Tag Parser",
+  // "C_Cpp.intelliSenseEngine": "Tag Parser",
   "files.associations": {
     "esp_spi_flash.h": "c",
     "array": "c",
@@ -42,7 +42,11 @@
     "bt_common.h": "c",
     "list.h": "c",
     "stdbool.h": "c",
-    "bsp_mi2c.h": "c"
+    "bsp_mi2c.h": "c",
+    "stdint.h": "c",
+    "bsp_ledc.h": "c",
+    "thread": "c",
+    "app_led.h": "c"
   },
   "idf.adapterTargetName": "esp32",
   "commentTranslate.source": "Bing",
