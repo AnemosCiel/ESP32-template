@@ -29,11 +29,14 @@
 #include "bsp_mi2c.h"
 #include "bsp_spi.h"
 #include "bsp_adc.h"
-#include "bsp_pwm.h"
+#include "bsp_ledc.h"
 #include "bsp_mcpwm.h"
 #include "bsp_now.h"
 /* dev */
 #include "dev_shtc3.h"
+
+/* app */
+#include "app_led.h"
 
 QueueHandle_t uartQueue = NULL;
 SemaphoreHandle_t uartSemphr = NULL;
@@ -333,12 +336,11 @@ void user_lowpwoer( void )
  */
 void user_task( void *arg )
 {
-    char InfoBuffer[512] = {0};
-    float temp,humi;
+    // char InfoBuffer[512] = {0};
+
     while( 1 )
     {
-        dev_shtc3_measurement(&temp, &humi);
-        printf("T:%f, H:%f\r\n", temp, humi);
+        app_led_core();
         // printf( "heap size:%d\n", esp_get_free_heap_size() );
         // vTaskList( ( char * )&InfoBuffer );
         // printf( "任务名      任务状态  优先级   剩余栈 任务序号(R:Ready   B:Block    S:Suspend)\r\n" );
@@ -346,7 +348,7 @@ void user_task( void *arg )
         // vTaskGetRunTimeStats( ( char * )&InfoBuffer );
         // printf( "\r\n任务名          运行计数         使用率\r\n" );
         // printf( "%s\r\n", InfoBuffer );
-        vTaskDelay( pdMS_TO_TICKS( 1000 ) );
+        vTaskDelay( pdMS_TO_TICKS( 1 ) );
     }
 }
 
@@ -358,16 +360,18 @@ void user_task( void *arg )
  */
 void user_init( void )
 {
+    uint8_t ssid[] = "Acher";
+    uint8_t key[] = "";
     // user_led_init();
     // user_key_init();
-    // bsp_pwm_init();
     // bsp_mcpwm_init();
-    bsp_mi2c_init();
+    // bsp_mi2c_init(1, 14, 12, 40000);
     // bsp_adc_init();
     // user_uart_init();
-    // bsp_wifi_init();
     // bsp_now_init();
     // user_lowpwoer();
+    bsp_ap_init(ssid, key, 1, 3);
+    bsp_server_start();
 #if TASK_INFO
     /* Show task info */
     xTaskCreate(user_task, "user_task", 4096, NULL, 10, NULL);

@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <form class="fixed" border="0">
+            <col width="1000px" />
+                <h2>wifi 配置</h2>
+            <div>
+                <label for="name">名称</label>
+                <input type="text" id="wifi" name="car_name" placeholder="ssid">
+                <br>
+                <label for="type">密码</label>
+                <input type="text" id="code" name="car_type" placeholder="password">
+                <br>
+                <button id ="send_WIFI" type="button" onclick="send_wifi()">提交</button>
+            </div>
+        </form>
+    </body>
+
+    <script>
+    function send_wifi() 
+    {
+        var input_ssid = document.getElementById("wifi").value;
+        var input_code = document.getElementById("code").value;
+        var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/wifi_data", true);
+            xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4) 
+                {
+                    if (xhttp.status == 200) {
+                        console.log(xhttp.responseText);
+                    } else if (xhttp.status == 0) {
+                        alert("Server closed the connection abruptly!");
+                        location.reload()
+                    } else {
+                        alert(xhttp.status + " Error!\n" + xhttp.responseText);
+                        location.reload()
+                    }
+                }
+            };
+        var data = {
+            "wifi_name":input_ssid,
+            "wifi_code":input_code
+        }
+            xhttp.send(JSON.stringify(data));
+    }
+    </script>
+</html>
